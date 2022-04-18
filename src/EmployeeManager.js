@@ -1,5 +1,4 @@
 const EmailService = require("./EmailService");
-const Report = require("./Report");
 const EmployeeFormat = require("./EmployeeFormat");
 
 module.exports = class EmployeeManager {
