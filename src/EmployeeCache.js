@@ -1,5 +1,3 @@
-//const EmployeeDAO = require('./EmployeeDAO');
-
 module.exports = class EmployeeCache {
   constructor(employeesData) {
     this.cache = null;
