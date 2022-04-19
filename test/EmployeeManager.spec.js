@@ -1,6 +1,9 @@
 const assert = require("assert");
 const EmployeeManager = require("../src/EmployeeManager");
 const MailerMock = require("./MailerMock");
+const EmailService = require("../src/EmailService");
+const EmployeeCache = require("../src/EmployeeCache");
+const EmployeeDAO = require('../src/EmployeeDAO');
 
 describe("EmployeeManager", () => {
   let dataSourceMock;
@@ -16,13 +19,20 @@ describe("EmployeeManager", () => {
   };
 
   const testSendMail = async (expected) => {
-    const manager = new EmployeeManager(mailerMock);
-    await manager.sendEmployeesReport(dataSourceMock);
+    const employeesDAO = new EmployeeDAO();
+    const employees = new EmployeeCache(employeesDAO);
+    
+    const emailService = new EmailService(mailerMock);
+    const manager = new EmployeeManager(emailService);
+   
+    let employeesData = await employees.readEmployees(dataSourceMock);
+    await manager.sendEmployeesReport(employeesData);
     assert.strictEqual(mailerMock.getLastSentItem().content, expected);
 
     //check caching
     mailerMock.resetHistory();
-    await manager.sendEmployeesReport(dataSourceErrorMock);
+    employeesData = await employees.readEmployees(dataSourceErrorMock);
+    await manager.sendEmployeesReport(employeesData);
     assert.strictEqual(mailerMock.getLastSentItem().content, expected);
   };
 
@@ -43,7 +53,7 @@ describe("EmployeeManager", () => {
     );
   });
 
-  it("send single employee report", () => {
+ it("send single employee report", () => {
     setDataSourceMock([
       {
         FIRST_NAME: "Wayne",

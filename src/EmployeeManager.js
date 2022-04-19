@@ -1,20 +1,19 @@
-const EmailService = require("./EmailService");
 const EmployeeFormat = require("./EmployeeFormat");
 
 module.exports = class EmployeeManager {
-  constructor(mailer) {
-    this.emailService = new EmailService(mailer);
+  constructor(emailService) {
+    this.emailService = emailService;
     this.employeeFormat = new EmployeeFormat();
   }
 
-  async createReportAsHtml(dataSource) {
-     return await this.employeeFormat.employeesAsHtml(dataSource);
+  async createReportAsHtml(employeesData) {
+    return await this.employeeFormat.employeesAsHtml(employeesData);
   }
 
-  async sendEmployeesReport(dataSource) {
+  async sendEmployeesReport(employeesData) {
     const subject = "Employees report";
 
-    const reportData = await this.createReportAsHtml(dataSource);
+    const reportData = await this.createReportAsHtml(employeesData);
 
     return await this.emailService.send(subject, reportData);
   }

@@ -1,12 +1,14 @@
 const assert = require("assert");
 const EmployeeFormat = require("../src/EmployeeFormat");
+const EmployeeCache = require("../src/EmployeeCache");
+const EmployeeDAO = require('../src/EmployeeDAO');
 
 describe("EmployeeFormat", () => {
   let dataSourceMock;
   const dataSourceErrorMock = {
     getAllEmployees: () => Promise.reject(),
   };
-
+  
   const setDataSourceMock = (employees) => {
     dataSourceMock = {
       getAllEmployees: () => Promise.resolve(employees),
@@ -15,12 +17,16 @@ describe("EmployeeFormat", () => {
 
   const testJsonConvert = async (json) => {
     const employeeFormat = new EmployeeFormat();
-    let serialized = await employeeFormat.employeesAsJson(dataSourceMock);
+    const employeesDAO = new EmployeeDAO();
+    const employees = new EmployeeCache(employeesDAO);
 
+    let employeesData = await employees.readEmployees(dataSourceMock);
+    let serialized = await employeeFormat.employeesAsJson(employeesData);
     assert.strictEqual(serialized, json);
 
     //check caching
-    serialized = await employeeFormat.employeesAsJson(dataSourceErrorMock);
+    employeesData = await employees.readEmployees(dataSourceErrorMock);
+    serialized = await employeeFormat.employeesAsJson(employeesData);
     assert.strictEqual(serialized, json);
   };
 

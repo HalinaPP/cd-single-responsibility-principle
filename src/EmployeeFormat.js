@@ -1,16 +1,6 @@
-const EmployeeController = require("./EmployeeController");
-
-
 module.exports = class EmployeeFormat {
 
-  constructor() {
-    this.employees = new EmployeeController();
-  }
-
-
-
-  async employeesAsHtml(dataSource) {
-    const employeesData = await this.employees.readEmployees(dataSource);
+  async employeesAsHtml(employeesData) {
 
     const header = "<tr><th>Employee</th><th>Position</th></tr>";
     const tableStart = `<table>${header}`;
@@ -29,9 +19,7 @@ module.exports = class EmployeeFormat {
     );
   }
 
-  async employeesAsJson(dataSource) {
-    const employeesData = await this.employees.readEmployees(dataSource);
-
+  async employeesAsJson(employeesData) {
     const result = employeesData.reduce(
       (collection, employee) =>
         Object.assign(collection, {
